@@ -1,0 +1,85 @@
+heat_template_version: 2014-10-16
+
+description: Create a server instance & BGPaaS 
+
+parameters:
+  server_bgpaas_name:
+    type: string
+  image: 
+    type: string
+  flavor: 
+    type: string
+  private_net_name_0:
+    type: string
+  private_net_cidr_0:
+    type: string
+  autonomous_system:
+    type: number
+
+
+resources:
+  private_net_0:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: private_net_name_0 }
+
+  private_subnet_0:
+    type: OS::Neutron::Subnet
+    properties:
+      network_id: { get_resource: private_net_0 }
+      cidr: { get_param: private_net_cidr_0 }
+
+  server_1:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: server_bgpaas_name }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      networks:
+        - network: { get_resource: private_net_0 }
+  
+  bfd_health_check:
+    type: OS::ContrailV2::ServiceHealthCheck
+    properties:
+      name: bgpaas_bfd_check
+      service_health_check_properties:
+        {
+          service_health_check_properties_enabled: true,
+          service_health_check_properties_health_check_type: link-local,
+          service_health_check_properties_monitor_type: BFD,
+          service_health_check_properties_delay: 50,
+          service_health_check_properties_timeout: 30,
+          service_health_check_properties_max_retries: 6,
+          service_health_check_properties_url_path: { get_attr: [server_1, addresses, get_param: private_net_name_0, 0, "addr"]} 
+        }
+  
+  bgpaas_1:
+    type: OS::ContrailV2::BgpAsAService
+    properties:
+       name: bgpaas-1
+       virtual_machine_interface_refs: [{ get_attr: [server_1, addresses, get_param: private_net_name_0, 0, "port"]  }]
+       autonomous_system: { get_param: autonomous_system }
+       service_health_check_refs: [{ get_resource: bfd_health_check }]
+       bgpaas_session_attributes:
+         {
+           bgpaas_session_attributes_address_families:
+             {
+               bgpaas_session_attributes_address_families_family: ['inet','inet6'],
+              },
+         bgpaas_session_attributes_family_attributes:
+            [{
+              bgpaas_session_attributes_family_attributes_address_family: inet,
+              bgpaas_session_attributes_family_attributes_loop_count: 1,
+              bgpaas_session_attributes_family_attributes_prefix_limit:
+                {
+                  bgpaas_session_attributes_family_attributes_prefix_limit_maximum: 5
+                }
+            }]
+         }
+
+outputs:
+  server_1_port_uuid:
+    description: Port UUID
+    value: { get_attr: [server_1, addresses, get_param: private_net_name_0, 0, "port"] }
+  server_1_ip:
+    value: { get_attr: [server_1, addresses, get_param: private_net_name_0, 0, "addr"]}

@@ -1,0 +1,7 @@
+parameters:
+  server_bgpaas_name: "bgpaas_srv"
+  image: "ubuntu-lab"
+  flavor: "m1.small"
+  private_net_name_0: "bgp_peering_net"
+  private_net_cidr_0: "1.1.1.0/24"
+  autonomous_system: "65000"
