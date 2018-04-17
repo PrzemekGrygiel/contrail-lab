@@ -1,4 +1,4 @@
-router id IP_ADDR;
+router id ${IP_ADDR};
 protocol device {
     scan time 60;
   }
@@ -32,14 +32,14 @@ protocol  bfd  {
                 min tx interval 50 ms;
                 idle tx interval 300 ms;
         };
-        neighbor GW_ADDR;
+        neighbor ${GW_ADDR};
  }
 
 protocol bgp test {
    multihop;
-   source address IP_ADDR; 
+   source address ${IP_ADDR}; 
    local as 65000;
    import all;
    export filter bgpaas_export;
-   neighbor GW_ADDR as 64512; 
+   neighbor ${GW_ADDR} as 64512; 
 }
