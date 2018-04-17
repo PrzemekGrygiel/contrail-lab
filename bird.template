@@ -1,0 +1,45 @@
+router id IP_ADDR;
+protocol device {
+    scan time 60;
+  }
+protocol kernel {
+    persist; # Don't remove routes on bird shutdown
+    scan time 60; # Scan kernel routing table every 20 seconds import all; # Default is import all
+    export all; # Default is export none
+  }
+
+ protocol direct {
+     interface "*";
+ }
+
+filter bgpaas_export {
+         if (net = 10.10.10.0/30) then
+             {
+                 bgp_community.add ((1,100));
+                 accept;
+             }
+
+         if (net = 10.10.10.4/30) then
+             {
+                 bgp_path.prepend(65000);
+                 accept;
+             }
+          else accept;
+}
+protocol  bfd  {
+        interface "eth*" {
+                min rx interval 20 ms;
+                min tx interval 50 ms;
+                idle tx interval 300 ms;
+        };
+        neighbor GW_ADDR;
+ }
+
+protocol bgp test {
+   multihop;
+   source address IP_ADDR; 
+   local as 65000;
+   import all;
+   export filter bgpaas_export;
+   neighbor GW_ADDR as 64512; 
+}

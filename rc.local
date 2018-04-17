@@ -1,0 +1,12 @@
+export IP_ADDR=$(ip -4 address show dev eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+export GW_ADDR=$(ip route | awk '/default/{print $3}')
+envsubst < /root/bird.template  > /etc/bird/bird.conf
+service bird restart
+
+echo "###### This is server #########" > /var/www/html/test.html
+uname -n >> /var/www/html/test.html
+echo "###############################" >>/var/www/html/test.html
+
+exit 0
+
+
