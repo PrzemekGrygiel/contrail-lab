@@ -1,6 +1,11 @@
 #!/bin/bash
 echo "starting create Openstck demo VM"
 sudo yum -y install qemu-kvm qemu-img virt-manager libvirt libvirt-python libvirt-client virt-install libguestfs-tools
+yum install -y gcc python-devel wget
+pip install python-openstackclient
+pip install python-ironicclient
+pip install python-neutronclient
+pip install python-heatclient
 sudo systemctl start libvirtd
 cd /tmp
 sudo wget https://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
