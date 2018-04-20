@@ -1,0 +1,83 @@
+heat_template_version: ocata 
+
+description: Create servers instances & anycast balance using ECMP 
+
+parameters:
+  server_name:
+    type: string
+  image: 
+    type: string
+  flavor: 
+    type: string
+  private_net_name_0:
+    type: string
+  private_net_cidr_0:
+    type: string
+
+resources:
+  private_net_0:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: private_net_name_0 }
+
+  private_subnet_0:
+    type: OS::Neutron::Subnet
+    properties:
+      network_id: { get_resource: private_net_0 }
+      cidr: { get_param: private_net_cidr_0 }
+
+
+  server_1:
+    type: OS::Nova::Server
+    depends_on: [private_net_0]
+    properties:
+      name: "app-front-srv-1"
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      networks:
+        - network: { get_resource: private_net_0  }
+
+
+  server_2:
+    type: OS::Nova::Server
+    depends_on: [private_net_0]
+    properties:
+      name: "app-front-srv-2"
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      networks:
+        - network: { get_resource: private_net_0  }
+   
+  server_3:
+    type: OS::Nova::Server
+    depends_on: [private_net_0]
+    properties:
+      name: "app-client"
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      networks:
+        - network: { get_resource: private_net_0 }
+
+  static-route:
+    type: OS::ContrailV2::InterfaceRouteTable
+    properties:
+      name: "anycast-static-route"
+      interface_route_table_routes:
+       {
+         interface_route_table_routes_route:
+           [{
+             interface_route_table_routes_route_prefix: "10.10.10.1/32",
+          }]
+       }
+
+  http_health_check:
+    type: OS::ContrailV2::ServiceHealthCheck
+    properties:
+      name: "anycast_http_check"
+      service_health_check_properties:
+        {
+          service_health_check_properties_enabled: true,
+          service_health_check_properties_health_check_type: link-local,
+          service_health_check_properties_monitor_type: HTTP,
+          service_health_check_properties_url_path: "http://100.10.10.1/test.html"
+        }

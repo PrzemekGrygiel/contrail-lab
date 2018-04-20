@@ -1,0 +1,6 @@
+parameters:
+  server_name: "frontend-app-srv"
+  image: "ubuntu-lab"
+  flavor: "m1.small"
+  private_net_name_0: "frontend-app-net"
+  private_net_cidr_0: "2.2.2.0/24"
