@@ -6,13 +6,16 @@
 #
 #
 # Usage:
-# BOOTSTRAP=1 ./deploy.sh 10.10.16.104
-# BOOTSTRAP=1 INSTALL_CONTRAIL=1 ./deploy.sh 10.10.16.104
+# BOOTSTRAP=1 CONTRAIL_VERSION=ocata-master-60 KOLLA_COMMIT=826658e7d49996844231e0a25131ffd947ff065e ./deploy.sh 10.10.16.104
+# BOOTSTRAP=1 INSTALL_CONTRAIL=1 CONTRAIL_VERSION=ocata-master-60 KOLLA_COMMIT=826658e7d49996844231e0a25131ffd947ff065e ./deploy.sh 10.10.16.104
 #
 #
 # ANSIBLE_DEPLOYER_URL - Ansible deployer URL
 # ANSIBLE_DEPLOYER_COMMIT - Ansible deployer commit ID
 # ANSIBLE_DEPLOYER_CLEANUP - Remove old contrail-ansible-deployer dir
+# CONTRAIL_VERSION - Contrail version
+# CONTRAIL_REGISTRY - Contrail registry
+# KOLLA_COMMIT - Kolla commit ID
 # NUMBER_OF_VMS - Number of VMS to spawn
 # SERVER_HOST - KVM node IP
 # REQUIRED_PACKAGES - Packages which should be install on KVM node
@@ -24,6 +27,9 @@
 ANSIBLE_DEPLOYER_URL=https://github.com/Juniper/contrail-ansible-deployer
 ANSIBLE_DEPLOYER_COMMIT=${ANSIBLE_DEPLOYER_COMMIT:-"master"}
 ANSIBLE_DEPLOYER_CLEANUP=${ANSIBLE_DEPLOYER_CLEANUP:-0}
+CONTRAIL_VERSION=${CONTRAIL_VERSION:-"latest"}
+CONTRAIL_REGISTRY=${CONTRAIL_REGISTRY:-"opencontrailnightly"}
+KOLLA_COMMIT=${KOLLA_COMMIT:-"master"}
 NUMBER_OF_VMS=${NUMBER_OF_VMS:-"3"}
 SERVER_HOST=${SERVER_HOST:-$1}
 REQUIRED_PACKAGES=${REQUIRED_PACKAGES:-"python-urllib3 libguestfs-tools libvirt-python virt-install libvirt git ansible python-pip vim screen tcpdump ntp"}
@@ -72,8 +78,8 @@ instances:
         vrouter:
         openstack_compute:
 contrail_configuration:
-  CONTAINER_REGISTRY: opencontrailnightly
-  CONTRAIL_VERSION: ocata-master-60
+  CONTAINER_REGISTRY: ${CONTRAIL_REGISTRY}
+  CONTRAIL_VERSION: ${CONTRAIL_VERSION}
   UPGRADE_KERNEL: true
   RABBITMQ_NODE_PORT: 5673
   AUTH_MODE: keystone
@@ -81,6 +87,7 @@ contrail_configuration:
   KEYSTONE_AUTH_ADMIN_PASSWORD: contrail123
   CLOUD_ORCHESTRATOR: openstack
 kolla_config:
+  commit_id: ${KOLLA_COMMIT}
   customize:
     nova.conf: |
       [libvirt]
