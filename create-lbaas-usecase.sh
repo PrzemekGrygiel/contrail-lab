@@ -1,2 +1,2 @@
 #!/bin/bash
-openstack stack create -t heat/lbaas-v2-lab.yaml lbaas-lab
+openstack stack create -t heat/lbaas_v2-lab.yaml lbaas-lab
