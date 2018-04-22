@@ -53,7 +53,7 @@ resources:
     depends_on: [private_net_0]
     properties:
       name: "app-client"
-      image: { get_param: image }
+      image: "cirros2"
       flavor: { get_param: flavor }
       networks:
         - network: { get_resource: private_net_0 }
