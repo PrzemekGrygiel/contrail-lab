@@ -1,3 +1,8 @@
+
+#configure additional interfaces to announce via BGP
+for i in `seq 1 10`; do ifconfig lo:$i 10.10.10.$i/32; done
+service networking restart
+
 #configure Bird - BGP demon
 export IP_ADDR=$(ip -4 address show dev eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 export GW_ADDR=$(ip route | awk '/default/{print $3}')
@@ -9,9 +14,6 @@ echo "###### This is server #########" > /var/www/html/test.html
 uname -n >> /var/www/html/test.html
 echo "###############################" >>/var/www/html/test.html
 
-#configure additional interfaces to announce via BGP
-for i in `seq 1 10`; do echo -e "auto lo:$i\niface lo:$i inet static\n\taddress 100.10.10.$i\n\tnetmask 255.255.255.255\n"; done >> /etc/network/interfaces
-service networking restart
 
 exit 0
 

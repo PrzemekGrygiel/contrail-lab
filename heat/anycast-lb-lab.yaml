@@ -79,5 +79,5 @@ resources:
           service_health_check_properties_enabled: true,
           service_health_check_properties_health_check_type: link-local,
           service_health_check_properties_monitor_type: HTTP,
-          service_health_check_properties_url_path: "http://100.10.10.1/test.html"
+          service_health_check_properties_url_path: "http://10.10.10.1/test.html"
         }
