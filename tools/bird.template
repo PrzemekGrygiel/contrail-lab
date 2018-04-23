@@ -9,22 +9,22 @@ protocol kernel {
   }
 
  protocol direct {
-     interface "*";
+     interface "lo*";
  }
 
 filter bgpaas_export {
-         if (net = 100.10.10.0/30) then
+         if (net = 10.10.10.0/30) then
              {
                  bgp_community.add ((1,100));
                  accept;
              }
 
-         if (net = 100.10.10.4/30) then
+         if (net = 10.10.10.4/30) then
              {
                  bgp_path.prepend(65000);
                  accept;
              }
-          else accept;
+         else accept;
 }
 protocol  bfd  {
         interface "eth*" {

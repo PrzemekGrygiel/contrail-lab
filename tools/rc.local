@@ -1,7 +1,10 @@
 
 #configure additional interfaces to announce via BGP
-for i in `seq 1 10`; do ifconfig lo:$i 10.10.10.$i/32; done
-service networking restart
+
+ifconfig lo:1 10.10.10.1/30;
+ifconfig lo:2 10.10.10.5/30;
+ifconfig lo:3 10.10.10.9/30;
+
 
 #configure Bird - BGP demon
 export IP_ADDR=$(ip -4 address show dev eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
