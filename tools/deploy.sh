@@ -6,8 +6,8 @@
 #
 #
 # Usage:
-# BOOTSTRAP=1 CONTRAIL_VERSION=ocata-master-60 KOLLA_COMMIT=826658e7d49996844231e0a25131ffd947ff065e ./deploy.sh 10.10.16.104
-# BOOTSTRAP=1 INSTALL_CONTRAIL=1 CONTRAIL_VERSION=ocata-master-60 KOLLA_COMMIT=826658e7d49996844231e0a25131ffd947ff065e ./deploy.sh 10.10.16.104
+# BOOTSTRAP=1 CONTRAIL_VERSION=ocata-master-60 KOLLA_COMMIT=2145c8753fe55bc380498ac606a9f944cf9db36d ./deploy.sh 10.10.16.104
+# BOOTSTRAP=1 INSTALL_CONTRAIL=1 CONTRAIL_VERSION=ocata-master-60 KOLLA_COMMIT=2145c8753fe55bc380498ac606a9f944cf9db36d ./deploy.sh 10.10.16.104
 #
 #
 # ANSIBLE_DEPLOYER_URL - Ansible deployer URL
@@ -29,10 +29,10 @@ ANSIBLE_DEPLOYER_COMMIT=${ANSIBLE_DEPLOYER_COMMIT:-"master"}
 ANSIBLE_DEPLOYER_CLEANUP=${ANSIBLE_DEPLOYER_CLEANUP:-0}
 CONTRAIL_VERSION=${CONTRAIL_VERSION:-"latest"}
 CONTRAIL_REGISTRY=${CONTRAIL_REGISTRY:-"opencontrailnightly"}
-KOLLA_COMMIT=${KOLLA_COMMIT:-"master"}
+KOLLA_COMMIT=${KOLLA_COMMIT:-"2c011bf40afc783acf2f1765584c0cf4d4494a93"}
 NUMBER_OF_VMS=${NUMBER_OF_VMS:-"3"}
 SERVER_HOST=${SERVER_HOST:-$1}
-REQUIRED_PACKAGES=${REQUIRED_PACKAGES:-"python-urllib3 libguestfs-tools libvirt-python virt-install libvirt git ansible python-pip vim screen tcpdump ntp"}
+REQUIRED_PACKAGES=${REQUIRED_PACKAGES:-"python-urllib3 libguestfs-tools libvirt-python virt-install libvirt git ansible-2.4.2.0 python-pip vim screen tcpdump ntp"}
 NETWORK_PREFIX=${NETWORK_PREFIX:-"192.168.122"}
 VMS_LAST_OCTET_PREFIX=${VMS_LAST_OCTET_PREFIX:-"10"}
 BOOTSTRAP=${BOOTSTRAP:-0}
@@ -120,6 +120,7 @@ EOF
 
 service libvirtd start
 service ntpd restart
+echo > ~/.ssh/known_hosts
 
 for i in $(seq 1 ${NUMBER_OF_VMS}); do
   if [[ "${ANSIBLE_DEPLOYER_CLEANUP}" =~ ^[yY]|[yY][eE][sS]|1|[tT][rR][uU][eE]$ ]]; then
