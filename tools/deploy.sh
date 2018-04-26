@@ -53,7 +53,7 @@ provider_config:
     ssh_public_key:
     ssh_private_key:
     vcpu: 8
-    vram: 64000
+    vram: 60000
     vdisk: 300G
     subnet_prefix: ${NETWORK_PREFIX}.0
     subnet_netmask: 255.255.255.0
