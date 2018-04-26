@@ -6,7 +6,7 @@
 #
 #
 # Usage:
-# BOOTSTRAP=1 CONTRAIL_VERSION=ocata-master-60 KOLLA_COMMIT=2145c8753fe55bc380498ac606a9f944cf9db36d ./deploy.sh 10.10.16.104
+# BOOTSTRAP=1 CONTRAIL_VERSION=ocata-master-60 KOLLA_COMMIT=2145c8753fe55bc380498ac606a9f944cf9db36d ./deploy.sh 10.10.16.124
 # BOOTSTRAP=1 INSTALL_CONTRAIL=1 CONTRAIL_VERSION=ocata-master-60 KOLLA_COMMIT=2145c8753fe55bc380498ac606a9f944cf9db36d ./deploy.sh 10.10.16.104
 #
 #
@@ -120,6 +120,8 @@ EOF
 
 service libvirtd start
 service ntpd restart
+iptables -I INPUT -p udp --dport 123 -j ACCEPT
+
 echo > ~/.ssh/known_hosts
 
 for i in $(seq 1 ${NUMBER_OF_VMS}); do
