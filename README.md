@@ -2,7 +2,7 @@
 
 git clone https://github.com/PrzemekGrygiel/contrail-lab.git
 
-cd contrail-lab
+cd contrail-lab/tools
 
 To create service VM run. 
 
@@ -11,5 +11,4 @@ To create service VM run.
 It will build Ubuntu VM with WWW server and dynamic Bird config - BGP router snd upload as ubuntu-lab image into Glance
 
 To run BGPaaS usecase 
-
 ./create-bgpaas-usecase.sh
