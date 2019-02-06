@@ -1,0 +1,75 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a VirtualDns:
+
+parameters:
+  vdns_name:
+    type: string
+    description: name for the VirtualDns
+  vdns_fq_name:
+    type: string
+    description: fq_name for the VirtualDns
+  vdns_display_name:
+    type: string
+    description: display_name for the VirtualDns
+  virtual_DNS_data_domain_name:
+    type: string
+    description: domain_name for the VirtualDns
+  virtual_DNS_data_dynamic_records_from_client:
+    type: boolean
+    description: dynamic_records_from_client for the VirtualDns
+  virtual_DNS_data_record_order:
+    type: string
+    description: record_order for the VirtualDns
+  virtual_DNS_data_default_ttl_seconds:
+    type: number
+    description: default_ttl_seconds for the VirtualDns
+  virtual_DNS_data_next_virtual_DNS:
+    type: string
+    description: next_virtual_DNS for the VirtualDns
+  virtual_DNS_data_floating_ip_record:
+    type: string
+    description: floating_ip_record for the VirtualDns
+  virtual_DNS_data_external_visible:
+    type: boolean
+    description: external_visible for the VirtualDns
+  virtual_DNS_data_reverse_resolution:
+    type: boolean
+    description: reverse_resolution for the VirtualDns
+  vdns_domain:
+    type: string
+    description: domain for the VirtualDns
+  openshift_network:
+    type: string
+    description: Name of management network to be created
+
+resources:
+
+  template_NetworkIpam_1:
+    type: OS::ContrailV2::NetworkIpam
+    depends_on: [ template_VirtualDns ]
+    properties:
+      name: { get_param: openshift_network }
+      virtual_DNS_refs: [ {get_resource: template_VirtualDns} ]
+
+  template_VirtualDns:
+    type: OS::ContrailV2::VirtualDns
+    properties:
+      name: { get_param: vdns_name }
+      fq_name: { get_param: vdns_fq_name }
+      display_name: { get_param: vdns_display_name }
+      virtual_DNS_data:
+        {
+          virtual_DNS_data_domain_name: { get_param: virtual_DNS_data_domain_name },
+          virtual_DNS_data_dynamic_records_from_client: { get_param: virtual_DNS_data_dynamic_records_from_client },
+          virtual_DNS_data_record_order: { get_param: virtual_DNS_data_record_order },
+          virtual_DNS_data_default_ttl_seconds: { get_param: virtual_DNS_data_default_ttl_seconds },
+          virtual_DNS_data_next_virtual_DNS: { get_param: virtual_DNS_data_next_virtual_DNS },
+          virtual_DNS_data_floating_ip_record: { get_param: virtual_DNS_data_floating_ip_record },
+          virtual_DNS_data_external_visible: { get_param: virtual_DNS_data_external_visible },
+          virtual_DNS_data_reverse_resolution: { get_param: virtual_DNS_data_reverse_resolution },
+        }
+      domain: { get_param: vdns_domain }
+
+
