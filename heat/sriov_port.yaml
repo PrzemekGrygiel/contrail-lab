@@ -1,0 +1,71 @@
+heat_template_version: queens
+description: Heat template with Provider network example
+
+parameters:
+  provider_net_name:
+    type: string
+  provider_net_prefix:
+    type: string
+  provider_net_mask:
+    type: string
+  provider_phy_net_name:
+    type: string
+  provider_phy_net_vlan:
+    type: string
+
+
+resources:
+  ipam_provider_net:
+    type: OS::ContrailV2::NetworkIpam
+    properties:
+       name:
+        str_replace:
+          template: "ipam_%ident%"
+          params:
+            '%ident%': {get_param: provider_net_name}
+  
+  provider_net_vn:
+    type: OS::ContrailV2::VirtualNetwork
+    properties:
+      name: { get_param: provider_net_name }
+      provider_properties:
+        {
+          provider_properties_segmentation_id: { get_param: provider_phy_net_vlan },
+          provider_properties_physical_network: { get_param: provider_phy_net_name },
+        }
+      network_ipam_refs: [{ get_resource: ipam_provider_net }]
+      network_ipam_refs_data:
+        [{
+          network_ipam_refs_data_ipam_subnets:
+            [{
+              network_ipam_refs_data_ipam_subnets_subnet:
+                {
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix: { get_param: provider_net_prefix },
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: provider_net_mask },
+                },
+                network_ipam_refs_data_ipam_subnets_enable_dhcp: 'true',
+                network_ipam_refs_data_ipam_subnets_addr_from_start: 'true',
+         }]
+     }]
+
+
+  vmi_provider_example:
+    type: OS::ContrailV2::VirtualMachineInterface
+    properties:
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ provider_net_vn, fq_name ] } ] }]
+      virtual_machine_interface_bindings:
+        {
+          virtual_machine_interface_bindings_key_value_pair:
+            [{
+              virtual_machine_interface_bindings_key_value_pair_key: "vnic_type",
+              virtual_machine_interface_bindings_key_value_pair_value: "direct",
+            }],
+        }
+
+  instance_provider_example:
+    type: OS::ContrailV2::InstanceIp
+    depends_on: [ vmi_provider_example]
+    properties:
+      virtual_machine_interface_refs: [{ get_resource: vmi_provider_example }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ provider_net_vn, fq_name ] } ] }]
+      
